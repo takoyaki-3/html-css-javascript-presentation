@@ -4,10 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HTML／CSS／JavaScriptを生成AIでフルスクラッチして作るプレゼン資料</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     :root {
       --accent-start:#3b82f6;
       --accent-end:#06b6d4;
+      --accent-glow: rgba(59, 130, 246, 0.5);
       --bg-light:#f1f5f9;
       --bg-white:#ffffff;
       --fg-dark:#0f172a;
@@ -17,43 +19,214 @@
       --sidebar-w:260px;
       --radius:14px;
       --frame-gap:1.5rem;
+      --transition-speed: 0.4s;
     }
+
+    /* ダークモード用の変数 */
+    body.dark-mode {
+      --bg-light: #1e293b;
+      --bg-white: #0f172a;
+      --fg-dark: #f1f5f9;
+      --fg-light: #cbd5e1;
+      --accent-glow: rgba(6, 182, 212, 0.5);
+    }
+
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:"Segoe UI",Roboto,"Noto Sans JP",sans-serif;background:linear-gradient(135deg,var(--accent-start),var(--accent-end));color:var(--fg-dark);height:100vh;overflow:hidden;display:flex;}
+    body{font-family:"Segoe UI",Roboto,"Noto Sans JP",sans-serif;background:linear-gradient(135deg,var(--accent-start),var(--accent-end));color:var(--fg-dark);height:100vh;overflow:hidden;display:flex; transition: color 0.3s ease, background-color 0.3s ease;}
+    #particles-js {position: fixed; width: 100%; height: 100%; z-index: -1;}
     /* SIDEBAR */
-    #sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sidebar-w);background:var(--bg-white);border-right:1px solid #e2e8f0;padding:1.5rem 1rem;z-index:1100;overflow-y:auto;}
-    #sidebar h1{font-size:1.3rem;margin-bottom:1.5rem;color:var(--accent-start);}#sidebar nav a{display:block;margin:.3rem 0;padding:.5rem .75rem;border-radius:6px;color:var(--fg-light);text-decoration:none;transition:.2s;}#sidebar nav a:hover,#sidebar nav a.active{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:#fff;}
+    #sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sidebar-w);background:var(--bg-white);border-right:1px solid #e2e8f0;padding:1.5rem 1rem;z-index:1100;overflow-y:auto; transition: transform var(--transition-speed) ease-in-out, background-color 0.3s ease, border-color 0.3s ease; box-shadow: 2px 0 15px rgba(0,0,0,0.1);}
+    body.dark-mode #sidebar { border-right-color: rgba(203, 213, 225, 0.1); }
+    #sidebar.hidden { transform: translateX(-100%); }
+    #sidebar h1{font-size:1.3rem;margin-bottom:1.5rem;color:var(--accent-start); display: flex; justify-content: space-between; align-items: center;}
+    #sidebar h1 i {margin-right: 8px; color: var(--accent-start);}
+    #maximize-btn { background: none; border: none; cursor: pointer; font-size: 1.5rem; color: var(--accent-start); transition: transform 0.3s ease;}
+    #maximize-btn:hover { transform: scale(1.2); color: var(--accent-end);}
+    #sidebar nav a{display:block;margin:.5rem 0;padding:.75rem .75rem;border-radius:6px;color:var(--fg-light);text-decoration:none;transition:.3s; display: flex; align-items: center;}
+    #sidebar nav a i {margin-right: 10px; width: 20px; text-align: center;}
+    #sidebar nav a:hover,#sidebar nav a.active{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:#fff; transform: translateX(5px); box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);}
     /* MAIN */
-    main{margin-left:var(--sidebar-w);flex:1;position:relative;height:100vh;display:flex;align-items:center;justify-content:center;}
-    .slide-header,.slide-footer{position:fixed;left:var(--sidebar-w);width:calc(100% - var(--sidebar-w));display:flex;align-items:center;padding:0 1.5rem;color:#fff;pointer-events:none;}
-    .slide-header{top:0;height:var(--header-h);background:linear-gradient(90deg,var(--accent-end),var(--accent-start));font-size:1.15rem;font-weight:600;}
-    .slide-footer{bottom:0;height:var(--footer-h);background:var(--bg-light);color:var(--fg-light);justify-content:flex-end;pointer-events:auto;}
+    main{margin-left:var(--sidebar-w);flex:1;position:relative;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center; transition: margin-left 0.3s ease-in-out;}
+    main.fullscreen { margin-left: 0; }
+    .slide-header{position:fixed;left:var(--sidebar-w);right:0;top:0;height:var(--header-h);display:flex;align-items:center;justify-content:center;padding:0 1.5rem;color:#fff;background:rgba(0,0,0,0.1);backdrop-filter:blur(5px);transition: left 0.3s ease-in-out, right 0.3s ease-in-out;}
+    .slide-footer{position:fixed;left:var(--sidebar-w);right:0;bottom:0;height:var(--footer-h);display:flex;align-items:center;justify-content:center;padding:0 1.5rem;color:#fff;background:rgba(0,0,0,0.1);backdrop-filter:blur(5px);transition: left 0.3s ease-in-out, right 0.3s ease-in-out;}
+    .slide-header.fullscreen, .slide-footer.fullscreen { left: 0; }
     section{position:absolute;inset:var(--header-h) var(--frame-gap) var(--footer-h) var(--frame-gap);display:none;flex-direction:column;justify-content:center;align-items:center;overflow:hidden;}
     section.active{display:flex;animation:fade .35s ease;}@keyframes fade{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:scale(1);}}
-    .slide-card{width:100%;height:100%;background:var(--bg-white);border-radius:var(--radius);box-shadow:0 4px 18px rgba(0,0,0,.1);padding:clamp(1.5rem,4vw,3rem);overflow:auto;display:flex;flex-direction:column;}
+    .slide-card{width:100%;height:100%;background:var(--bg-white);border-radius:var(--radius);box-shadow:0 4px 18px rgba(0,0,0,.1);padding:clamp(1.5rem,4vw,3rem);overflow:auto;display:flex;flex-direction:column; transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;}
+    body.dark-mode .slide-card { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); }
     .slide-card h2{font-size:clamp(1.75rem,4vw,2.5rem);color:var(--accent-start);text-align:center;margin-bottom:1rem;}
     .slide-card p,.slide-card ul,.slide-card ol{font-size:clamp(1rem,2vw,1.2rem);margin:.8rem 0;text-align:center;line-height:1.6;}
     .slide-card ul,.slide-card ol{text-align:left;padding-left:1.2rem;}
     .slide-card pre{background:#0f172a;color:#f8fafc;padding:1rem;border-radius:8px;overflow-x:auto;font-size:1rem;}
+    body.dark-mode .slide-card pre { background: #1e293b; color: #f1f5f9; }
+    body.dark-mode a { color: var(--accent-end); }
+
+    /* ダークモードのチャート調整 */
+    body.dark-mode .chart-card { background: #1e293b; }
+    body.dark-mode #threshold { background: #334155; }
+    body.dark-mode #controls label { color: var(--fg-light); }
+
     /* Embed */
     .embed-wrap{width:100%;height:calc(100% - 9rem);margin-top:1rem;} .embed-wrap iframe{width:100%;height:100%;border:none;border-radius:8px;}
     /* Charts grid */
     .chart-grid{display:grid;gap:1rem;margin-top:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));flex:1;}
-    .chart-card{background:var(--bg-light);border-radius:8px;padding:1rem;display:flex;flex-direction:column;align-items:center;}
+    .chart-card{background:var(--bg-light);border-radius:8px;padding:1rem;display:flex;flex-direction:column;align-items:center; transition: background-color 0.3s ease;}
     .chart-card canvas{width:100% !important;height:260px !important;}
     #controls{margin-top:1rem;display:flex;gap:1rem;align-items:center;justify-content:center;}
     @media(max-width:1024px){.slide-card{padding:clamp(1rem,3vw,2rem);}}
-    @media(max-width:768px){.slide-card{padding:1.5rem 1rem;} .slide-header,.slide-footer{display:none;} section{inset:0;} .embed-wrap{height:calc(100% - 6rem);} main,body{overflow:auto;height:auto;}}
+    @media(max-width:768px){
+      main{margin-left:0;height:100vh;overflow:auto;}
+      #sidebar{transform:translateX(-100%);}
+      #sidebar.visible{transform:translateX(0);}
+      .slide-header,.slide-footer{left:0;backdrop-filter:blur(5px);}
+      section{position:relative;inset:0;margin:var(--header-h) var(--frame-gap) var(--footer-h) var(--frame-gap);}
+      .embed-wrap{height:300px;}
+    }
+
+    /* スライドアニメーション効果 */
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slide-up {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes zoom-in {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slide-left {
+      from { opacity: 0; transform: translateX(50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes rotate-in {
+      from { opacity: 0; transform: rotate(-10deg) scale(0.9); }
+      to { opacity: 1; transform: rotate(0) scale(1); }
+    }
+    section.active.fade-in { animation: fade-in 0.6s ease forwards; }
+    section.active.slide-up { animation: slide-up 0.6s ease forwards; }
+    section.active.zoom-in { animation: zoom-in 0.6s ease forwards; }
+    section.active.slide-left { animation: slide-left 0.6s ease forwards; }
+    section.active.rotate-in { animation: rotate-in 0.6s ease forwards; }
+
+    /* ボタンとコントロールのアニメーション効果 */
+    button, input[type="range"] {
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* スライドカードの強化されたデザイン */
+    .slide-card {
+      background: linear-gradient(145deg, var(--bg-white), #f8fafc);
+      border: 1px solid rgba(255,255,255,0.7);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    body.dark-mode .slide-card {
+      background: linear-gradient(145deg, var(--bg-white), #1e293b);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .slide-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body.dark-mode .slide-card::before {
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    }
+    .slide-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 強調テキスト用のスタイル */
+    .accent-text {
+      background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: bold;
+    }
+
+    /* アイコン用のスタイル */
+    .icon-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      color: white;
+      margin-right: 10px;
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+    }
+
+    /* ダークモードトグルボタン */
+    #dark-mode-toggle {
+      position: fixed;
+      top: 12px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 1200;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+    }
+    #dark-mode-toggle:hover {
+      transform: rotate(30deg) scale(1.1);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    /* モバイル側サイドバー表示改善 */
+    @media(max-width:768px) {
+      #sidebar.visible {
+        box-shadow: 0 0 20px rgba(0,0,0,0.25);
+      }
+      #mobile-menu-btn {
+        transition: all 0.3s ease;
+      }
+      #mobile-menu-btn:hover {
+        transform: rotate(90deg);
+      }
+    }
   </style>
 </head>
 <body>
-  <aside id="sidebar"><h1>プレゼン目次</h1><nav><a href="#slide0" data-index="0">トップ</a><a href="#slide1" data-index="1">自己紹介</a><a href="#slide2" data-index="2">背景と目的</a><a href="#slide3" data-index="3">使用技術</a><a href="#slide4" data-index="4">実装手順</a><a href="#slide5" data-index="5">コーディングデモ</a><a href="#slide6" data-index="6">モデル比較サイト</a><a href="#slide7" data-index="7">インタラクティブ分析</a><a href="#slide8" data-index="8">応用アイデア</a><a href="#slide9" data-index="9">まとめ・今後</a></nav></aside>
+  <div id="particles-js"></div>
+  <button id="dark-mode-toggle" title="ダークモード切替"><i class="fas fa-moon"></i></button>
+  <aside id="sidebar"><h1><i class="fas fa-sliders-h"></i>プレゼン目次<button id="maximize-btn">⛶</button></h1><nav><a href="#slide0" data-index="0">トップ</a><a href="#slide1" data-index="1">自己紹介</a><a href="#slide2" data-index="2">背景と目的</a><a href="#slide3" data-index="3">使用技術</a><a href="#slide4" data-index="4">実装手順</a><a href="#slide5" data-index="5">コーディングデモ</a><a href="#slide6" data-index="6">モデル比較サイト</a><a href="#slide7" data-index="7">インタラクティブ分析</a><a href="#slide8" data-index="8">応用アイデア</a><a href="#slide9" data-index="9">まとめ・今後</a></nav></aside>
   <main>
     <div class="slide-header">HTML/CSS/JS プレゼン</div>
     <!-- 0: Title -->
     <section id="slide0" class="active"><div class="slide-card"><h2>HTML／CSS／JavaScriptを生成AIで<br>フルスクラッチして作るプレゼン資料</h2><p>ChatGPTなどの生成AIを活用し、<br>Webベースのプレゼン資料を1つのHTMLファイルにまとめる方法を紹介します。</p></div></section>
     <!-- 1: Self Intro -->
-    <section id="slide1"><div class="slide-card"><h2>自己紹介</h2><p>鉄道会社のIT部門で内製開発をしています。<br><a href="https://takoyaki3.com/" target="_blank" rel="noopener">takoyaki3.com</a>という個人サイトなど趣味開発も好きです。</p><div class="embed-wrap"><iframe src="https://takoyaki3.com/" loading="lazy"></iframe></div></div></section>
+    <section id="slide1"><div class="slide-card"><h2>自己紹介</h2><p>鉄道会社のIT部門で内製開発をしています。<br><a href="https://takoyaki3.com/" target="_blank" rel="noopener">takoyaki3.com</a>という個人サイトを育ててます。</p><div class="embed-wrap"><iframe src="https://takoyaki3.com/" loading="lazy"></iframe></div></div></section>
     <!-- 2: Background -->
     <section id="slide2"><div class="slide-card"><h2>背景と目的</h2><ul><li><strong>AIで自動化</strong>し、スライド作成の手間を削減</li><li>ブラウザだけで閲覧可能な<strong>配布しやすい資料</strong></li><li>HTML1枚でコード共有も簡単</li></ul></div></section>
     <!-- 3: Tech -->
@@ -75,28 +248,522 @@ history.replaceState(null,'',`#slide${current}`);
     <div class="slide-footer">Slide <span id="num">1</span> / 10</div>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
   <script>
-    const navLinks=Array.from(document.querySelectorAll('#sidebar nav a'));
-    const slides=Array.from(document.querySelectorAll('main section'));
-    const numEl=document.getElementById('num');
-    let current=0;
-    const initHash=()=>{const h=location.hash.replace('#slide','');const i=parseInt(h);return(!isNaN(i)&&i>=0&&i<slides.length)?i:0};
-    const update=idx=>{slides[current].classList.remove('active');navLinks[current].classList.remove('active');current=idx;slides[current].classList.add('active');navLinks[current].classList.add('active');numEl.textContent=current+1;history.replaceState(null,'',`#slide${current}`);};
-    navLinks.forEach((l,i)=>{l.href=`#slide${i}`;l.addEventListener('click',e=>{e.preventDefault();update(i);});});
-    update(initHash());
-    document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')update((current+1)%slides.length);if(e.key==='ArrowLeft')update((current-1+slides.length)%slides.length);});
-    // Chart data
-    const months=[...Array(12).keys()].map(i=>`${i+1}月`);
-    const values=months.map(()=>Math.floor(Math.random()*100));
-    const ctxL=document.getElementById('lineChart').getContext('2d');
-    const ctxB=document.getElementById('barChart').getContext('2d');
-    const ctxP=document.getElementById('pieChart').getContext('2d');
-    const lineChart=new Chart(ctxL,{type:'line',data:{labels:months,datasets:[{label:'折れ線',data:[...values],borderColor:'rgba(59,130,246,0.7)',tension:.3}]},options:{responsive:true,maintainAspectRatio:false}});
-    const barChart=new Chart(ctxB,{type:'bar',data:{labels:months,datasets:[{label:'棒',data:[...values],backgroundColor:'rgba(6,182,212,0.6)'}]},options:{responsive:true,maintainAspectRatio:false}});
-    const pieChart=new Chart(ctxP,{type:'pie',data:{labels:['A','B','C','D'],datasets:[{data:[25,35,20,20],backgroundColor:['rgba(59,130,246,0.7)','rgba(6,182,212,0.7)','rgba(139,92,246,0.7)','rgba(16,185,129,0.7)']}]},options:{responsive:true,maintainAspectRatio:false}});
-    // Threshold filter
-    const slider=document.getElementById('threshold');const valSpan=document.getElementById('val');
-    slider.addEventListener('input',()=>{const t=+slider.value;valSpan.textContent=t;lineChart.data.datasets[0].data=values.map(v=>v>=t?v:null);barChart.data.datasets[0].data=values.map(v=>v>=t?v:null);lineChart.update();barChart.update();});
+    document.addEventListener('DOMContentLoaded', function() {
+      // ダークモードの初期化と切り替え
+      const darkModeToggle = document.getElementById('dark-mode-toggle');
+      const body = document.body;
+      const icon = darkModeToggle.querySelector('i');
+
+      // ローカルストレージからユーザー設定を読み込む
+      const isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+      // 初期状態の設定
+      if (isDarkMode) {
+        body.classList.add('dark-mode');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      }
+
+      // ダークモード切り替え関数
+      function toggleDarkMode() {
+        body.classList.toggle('dark-mode');
+
+        if (body.classList.contains('dark-mode')) {
+          icon.classList.remove('fa-moon');
+          icon.classList.add('fa-sun');
+          localStorage.setItem('darkMode', 'true');
+
+          // ダークモード時のチャート設定更新
+          updateChartsForDarkMode(true);
+        } else {
+          icon.classList.remove('fa-sun');
+          icon.classList.add('fa-moon');
+          localStorage.setItem('darkMode', 'false');
+
+          // ライトモード時のチャート設定更新
+          updateChartsForDarkMode(false);
+        }
+      }
+
+      // チャートのカラーモードを更新する関数
+      function updateChartsForDarkMode(isDark) {
+        const chartColor = isDark ? '#f1f5f9' : '#0f172a';
+
+        // 各チャートの設定を更新
+        if (window.lineChart) {
+          lineChart.options.plugins.title.color = chartColor;
+          lineChart.options.scales.x.ticks.color = chartColor;
+          lineChart.options.scales.y.ticks.color = chartColor;
+          lineChart.options.scales.x.grid.color = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+          lineChart.options.scales.y.grid.color = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+          lineChart.update();
+        }
+
+        if (window.barChart) {
+          barChart.options.plugins.title.color = chartColor;
+          barChart.options.scales.x.ticks.color = chartColor;
+          barChart.options.scales.y.ticks.color = chartColor;
+          barChart.options.scales.x.grid.color = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+          barChart.options.scales.y.grid.color = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+          barChart.update();
+        }
+
+        if (window.pieChart) {
+          pieChart.options.plugins.title.color = chartColor;
+          pieChart.options.plugins.legend.labels.color = chartColor;
+          pieChart.update();
+        }
+      }
+
+      // イベントリスナーの設定
+      darkModeToggle.addEventListener('click', toggleDarkMode);
+
+      // 初期表示時にチャートのモードを更新
+      if (isDarkMode) {
+        // DOMContentLoadedの後にチャートが初期化されるため、
+        // setTimeout で少し遅らせてチャート設定を適用
+        setTimeout(() => {
+          updateChartsForDarkMode(true);
+        }, 500);
+      }
+
+      // Particles.js初期化
+      particlesJS('particles-js', {
+        "particles": {
+          "number": {
+            "value": 80,
+            "density": {
+              "enable": true,
+              "value_area": 800
+            }
+          },
+          "color": {
+            "value": "#ffffff"
+          },
+          "shape": {
+            "type": "circle",
+            "stroke": {
+              "width": 0,
+              "color": "#000000"
+            },
+            "polygon": {
+              "nb_sides": 5
+            }
+          },
+          "opacity": {
+            "value": 0.5,
+            "random": false,
+            "anim": {
+              "enable": false,
+              "speed": 1,
+              "opacity_min": 0.1,
+              "sync": false
+            }
+          },
+          "size": {
+            "value": 3,
+            "random": true,
+            "anim": {
+              "enable": false,
+              "speed": 40,
+              "size_min": 0.1,
+              "sync": false
+            }
+          },
+          "line_linked": {
+            "enable": true,
+            "distance": 150,
+            "color": "#ffffff",
+            "opacity": 0.4,
+            "width": 1
+          },
+          "move": {
+            "enable": true,
+            "speed": 2,
+            "direction": "none",
+            "random": false,
+            "straight": false,
+            "out_mode": "out",
+            "bounce": false,
+            "attract": {
+              "enable": false,
+              "rotateX": 600,
+              "rotateY": 1200
+            }
+          }
+        },
+        "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+            "onhover": {
+              "enable": true,
+              "mode": "grab"
+            },
+            "onclick": {
+              "enable": true,
+              "mode": "push"
+            },
+            "resize": true
+          },
+          "modes": {
+            "grab": {
+              "distance": 140,
+              "line_linked": {
+                "opacity": 1
+              }
+            },
+            "bubble": {
+              "distance": 400,
+              "size": 40,
+              "duration": 2,
+              "opacity": 8,
+              "speed": 3
+            },
+            "repulse": {
+              "distance": 200,
+              "duration": 0.4
+            },
+            "push": {
+              "particles_nb": 4
+            },
+            "remove": {
+              "particles_nb": 2
+            }
+          }
+        },
+        "retina_detect": true
+      });
+
+      const navLinks=Array.from(document.querySelectorAll('#sidebar nav a'));
+      const slides=Array.from(document.querySelectorAll('main section'));
+      const numEl=document.getElementById('num');
+      let current=0;
+
+      // アイコンをサイドバーのナビゲーションリンクに追加
+      navLinks.forEach((link, index) => {
+        const icons = [
+          'fa-home', 'fa-user', 'fa-info-circle', 'fa-code',
+          'fa-list-ol', 'fa-laptop-code', 'fa-chart-bar',
+          'fa-chart-line', 'fa-lightbulb', 'fa-flag-checkered'
+        ];
+        link.innerHTML = `<i class="fas ${icons[index]}"></i>${link.textContent}`;
+      });
+
+      // スライド切り替えアニメーションの種類を増やす
+      const animations = ['fade-in', 'slide-up', 'zoom-in', 'slide-left', 'rotate-in'];
+
+      const initHash=()=>{const h=location.hash.replace('#slide','');const i=parseInt(h);return(!isNaN(i)&&i>=0&&i<slides.length)?i:0};
+
+      const update = idx => {
+        const oldSlide = slides[current];
+        const newSlide = slides[idx];
+
+        // 現在のスライドから全てのアニメーションクラスを削除
+        oldSlide.classList.remove('active');
+        animations.forEach(anim => oldSlide.classList.remove(anim));
+        navLinks[current].classList.remove('active');
+
+        // 新しいスライドを設定
+        current = idx;
+
+        // ランダムなアニメーションを適用
+        const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+        newSlide.classList.add('active', randomAnim);
+        navLinks[current].classList.add('active');
+
+        numEl.textContent = current + 1;
+        history.replaceState(null, '', `#slide${current}`);
+      };
+
+      navLinks.forEach((l,i)=>{
+        l.href=`#slide${i}`;
+        l.addEventListener('click',e=>{
+          e.preventDefault();
+          update(i);
+        });
+      });
+
+      update(initHash());
+
+      document.addEventListener('keydown',e=>{
+        if(e.key==='ArrowRight') update((current+1)%slides.length);
+        if(e.key==='ArrowLeft') update((current-1+slides.length)%slides.length);
+      });
+
+      // スライドをスワイプで切り替えるための機能追加
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      document.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, false);
+
+      document.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      }, false);
+
+      function handleSwipe() {
+        if (touchEndX < touchStartX - 100) {
+          // 左スワイプ
+          update((current+1)%slides.length);
+        } else if (touchEndX > touchStartX + 100) {
+          // 右スワイプ
+          update((current-1+slides.length)%slides.length);
+        }
+      }
+
+      // Chart data
+      const months=[...Array(12).keys()].map(i=>`${i+1}月`);
+      const values=months.map(()=>Math.floor(Math.random()*100));
+      const ctxL=document.getElementById('lineChart').getContext('2d');
+      const ctxB=document.getElementById('barChart').getContext('2d');
+      const ctxP=document.getElementById('pieChart').getContext('2d');
+
+      // アニメーション効果を加えたチャート
+      const lineChart=new Chart(ctxL, {
+        type:'line',
+        data:{
+          labels:months,
+          datasets:[{
+            label:'折れ線',
+            data:[...values],
+            borderColor:'rgba(59,130,246,0.7)',
+            backgroundColor: 'rgba(59,130,246,0.1)',
+            borderWidth: 3,
+            pointBackgroundColor: 'rgba(59,130,246,1)',
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            tension:.3
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          animation: {
+            duration: 2000,
+            easing: 'easeOutQuart'
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: '月次データ推移'
+            }
+          }
+        }
+      });
+
+      const barChart=new Chart(ctxB, {
+        type:'bar',
+        data:{
+          labels:months,
+          datasets:[{
+            label:'棒',
+            data:[...values],
+            backgroundColor: values.map(v =>
+              `rgba(${Math.floor(255 - v * 2)}, ${Math.floor(v * 2)}, 212, 0.7)`
+            ),
+            borderWidth: 1,
+            borderColor: '#06b6d4'
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          animation: {
+            delay: function(context) {
+              return context.dataIndex * 100;
+            },
+            duration: 1000
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: '月次データ比較'
+            }
+          }
+        }
+      });
+
+      const pieChart=new Chart(ctxP, {
+        type:'pie',
+        data:{
+          labels:['A','B','C','D'],
+          datasets:[{
+            data:[25,35,20,20],
+            backgroundColor:[
+              'rgba(59,130,246,0.7)',
+              'rgba(6,182,212,0.7)',
+              'rgba(139,92,246,0.7)',
+              'rgba(16,185,129,0.7)'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          animation: {
+            animateRotate: true,
+            animateScale: true
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'カテゴリ分布'
+            }
+          }
+        }
+      });
+
+      // Threshold filter
+      const slider=document.getElementById('threshold');
+      const valSpan=document.getElementById('val');
+
+      slider.addEventListener('input',()=>{
+        const t=+slider.value;
+        valSpan.textContent=t;
+
+        lineChart.data.datasets[0].data=values.map(v=>v>=t?v:null);
+        barChart.data.datasets[0].data=values.map(v=>v>=t?v:null);
+        barChart.data.datasets[0].backgroundColor=values.map(v=>
+          v>=t ? `rgba(${Math.floor(255 - v * 2)}, ${Math.floor(v * 2)}, 212, 0.7)` : 'rgba(200,200,200,0.2)'
+        );
+
+        lineChart.update();
+        barChart.update();
+      });
+
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.querySelector('main');
+      const slideHeader = document.querySelector('.slide-header');
+      const slideFooter = document.querySelector('.slide-footer');
+      const maximizeBtn = document.getElementById('maximize-btn');
+
+      // レスポンシブ対応のためのメディアクエリチェック
+      const mobileMediaQuery = window.matchMedia('(max-width: 768px)');
+
+      function handleMobileChange(e) {
+        if (e.matches) {
+          // モバイル表示用の処理
+          const menuBtn = document.createElement('button');
+          menuBtn.id = 'mobile-menu-btn';
+          menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+          menuBtn.style.cssText = 'position:fixed;top:8px;left:8px;z-index:1200;background:var(--accent-start);color:#fff;border:none;border-radius:8px;width:40px;height:40px;font-size:1.2rem;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;';
+          document.body.appendChild(menuBtn);
+
+          menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('visible');
+            menuBtn.classList.toggle('active');
+            if (menuBtn.classList.contains('active')) {
+              menuBtn.innerHTML = '<i class="fas fa-times"></i>';
+            } else {
+              menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+          });
+
+          navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+              sidebar.classList.remove('visible');
+              menuBtn.classList.remove('active');
+              menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            });
+          });
+        } else {
+          // デスクトップ表示に戻す処理
+          const menuBtn = document.getElementById('mobile-menu-btn');
+          if (menuBtn) menuBtn.remove();
+          sidebar.classList.remove('visible');
+        }
+      }
+
+      // 初期化時とレスポンシブ変更時に実行
+      mobileMediaQuery.addEventListener('change', handleMobileChange);
+      handleMobileChange(mobileMediaQuery);
+
+      maximizeBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('hidden');
+        mainContent.classList.toggle('fullscreen');
+        slideHeader.classList.toggle('fullscreen');
+        slideFooter.classList.toggle('fullscreen');
+
+        if (maximizeBtn.innerHTML === '⛶') {
+          maximizeBtn.innerHTML = '<i class="fas fa-compress"></i>';
+          maximizeBtn.title = 'プレゼンモードを終了';
+        } else {
+          maximizeBtn.innerHTML = '⛶';
+          maximizeBtn.title = 'プレゼンモードを開始';
+        }
+
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      });
+
+      document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+          sidebar.classList.remove('hidden');
+          mainContent.classList.remove('fullscreen');
+          slideHeader.classList.remove('fullscreen');
+          slideFooter.classList.remove('fullscreen');
+          maximizeBtn.innerHTML = '⛶';
+          maximizeBtn.title = 'プレゼンモードを開始';
+        }
+      });
+
+      // スライドカードに装飾とホバーエフェクトを追加
+      const slideCards = document.querySelectorAll('.slide-card');
+      slideCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          card.style.transform = 'translateY(-5px)';
+          card.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'translateY(0)';
+          card.style.boxShadow = '0 4px 18px rgba(0,0,0,0.1)';
+        });
+      });
+
+      // 装飾用のアイコンを要素に追加
+      const decorateHeadings = () => {
+        document.querySelectorAll('.slide-card h2').forEach(heading => {
+          // タイトルに装飾アイコンを追加（重複しないように事前チェック）
+          if (!heading.querySelector('.icon-wrap')) {
+            const icon = document.createElement('span');
+            icon.className = 'icon-wrap';
+            icon.innerHTML = '<i class="fas fa-star"></i>';
+            heading.insertBefore(icon, heading.firstChild);
+          }
+        });
+
+        // リストにアイコンを装飾
+        document.querySelectorAll('.slide-card ul li').forEach(item => {
+          if (!item.querySelector('i.fa-check-circle')) {
+            item.innerHTML = item.innerHTML.replace(/^<strong>(.*?)<\/strong>/, '<strong><i class="fas fa-check-circle" style="color:var(--accent-start);margin-right:6px;"></i>$1</strong>');
+          }
+        });
+      };
+
+      decorateHeadings();
+
+      // 特別なテキスト効果
+      const addTextEffects = () => {
+        // 重要なテキストをaccent-textクラスで装飾
+        document.querySelectorAll('.slide-card strong').forEach(strong => {
+          if (!strong.classList.contains('accent-text') && !strong.querySelector('.accent-text')) {
+            strong.classList.add('accent-text');
+          }
+        });
+      };
+
+      addTextEffects();
+    });
   </script>
 </body>
 </html>
