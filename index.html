@@ -51,8 +51,8 @@
     .slide-header{position:fixed;left:var(--sidebar-w);right:0;top:0;height:var(--header-h);display:flex;align-items:center;justify-content:center;padding:0 1.5rem;color:#fff;background:rgba(0,0,0,0.1);backdrop-filter:blur(5px);transition: left 0.3s ease-in-out, right 0.3s ease-in-out;}
     .slide-footer{position:fixed;left:var(--sidebar-w);right:0;bottom:0;height:var(--footer-h);display:flex;align-items:center;justify-content:center;padding:0 1.5rem;color:#fff;background:rgba(0,0,0,0.1);backdrop-filter:blur(5px);transition: left 0.3s ease-in-out, right 0.3s ease-in-out;}
     .slide-header.fullscreen, .slide-footer.fullscreen { left: 0; }
-    section{position:absolute;inset:var(--header-h) var(--frame-gap) var(--footer-h) var(--frame-gap);display:none;flex-direction:column;justify-content:center;align-items:center;overflow:hidden;}
-    section.active{display:flex;animation:fade .35s ease;}@keyframes fade{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:scale(1);}}
+    section{position:absolute;inset:var(--header-h) var(--frame-gap) var(--footer-h) var(--frame-gap);display:none;overflow:hidden;}
+    section.active{display:flex;animation:fade .35s ease;flex-direction:column;justify-content:flex-start;align-items:center;}
     .slide-card{width:100%;height:100%;background:var(--bg-white);border-radius:var(--radius);box-shadow:0 4px 18px rgba(0,0,0,.1);padding:clamp(1.5rem,4vw,3rem);overflow:auto;display:flex;flex-direction:column; transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;}
     body.dark-mode .slide-card { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); }
     .slide-card h2{font-size:clamp(1.75rem,4vw,2.5rem);color:var(--accent-start);text-align:center;margin-bottom:1rem;}
@@ -61,6 +61,22 @@
     .slide-card pre{background:#0f172a;color:#f8fafc;padding:1rem;border-radius:8px;overflow-x:auto;font-size:1rem;}
     body.dark-mode .slide-card pre { background: #1e293b; color: #f1f5f9; }
     body.dark-mode a { color: var(--accent-end); }
+
+    /* スライドカードのスクロール動作の改善 */
+    section {position:absolute;inset:var(--header-h) var(--frame-gap) var(--footer-h) var(--frame-gap);display:none;overflow:hidden;}
+    section.active{display:flex;animation:fade .35s ease;flex-direction:column;justify-content:flex-start;align-items:center;}
+    .slide-card {overflow-y:auto;scrollbar-width:thin;min-height:100%;}
+    .slide-card::-webkit-scrollbar {width:8px;}
+    .slide-card::-webkit-scrollbar-track {background:rgba(0,0,0,0.05);border-radius:8px;}
+    .slide-card::-webkit-scrollbar-thumb {background:var(--accent-start);border-radius:8px;}
+
+    /* ビジュアライゼーションスライド 及び インタラクティブ分析デモスライド用のスタイル調整 */
+    #slide3 .slide-card,
+    #slide8 .slide-card {
+      padding-bottom:2.5rem;
+      overflow-y: auto;
+      max-height: 100%; /* Ensures that overflow-y can trigger scrolling */
+    }
 
     /* ダークモードのチャート調整 */
     body.dark-mode .chart-card { background: #1e293b; }
@@ -159,6 +175,7 @@
     .accent-text {
       background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
       -webkit-background-clip: text;
+      background-clip: text; /* Standard property */
       -webkit-text-fill-color: transparent;
       font-weight: bold;
     }
@@ -215,12 +232,322 @@
         transform: rotate(90deg);
       }
     }
+
+    /* スマートアート用のスタイル */
+    .smartart-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin: 2rem 0;
+    }
+
+    /* プロセスフロー図のスタイル */
+    .process-flow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 900px;
+      position: relative;
+      margin: 1.5rem auto;
+    }
+
+    .process-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      width: 120px;
+      animation: pop-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    .process-step:nth-child(2) { animation-delay: 0.2s; }
+    .process-step:nth-child(3) { animation-delay: 0.4s; }
+    .process-step:nth-child(4) { animation-delay: 0.6s; }
+    .process-step:nth-child(5) { animation-delay: 0.8s; }
+
+    @keyframes pop-in {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .step-icon {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .process-step:hover .step-icon {
+      transform: translateY(-5px) rotate(5deg);
+      box-shadow: 0 8px 15px rgba(59, 130, 246, 0.5);
+    }
+
+    .step-text {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 0.5rem;
+      color: var(--accent-start);
+    }
+
+    .step-desc {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--fg-light);
+      max-width: 120px;
+    }
+
+    .process-flow::before {
+      content: '';
+      position: absolute;
+      top: 35px;
+      left: 60px;
+      right: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+      z-index: 1;
+    }
+
+    /* 比較表のスタイル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+    }
+
+    .comparison-table th {
+      background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+      color: white;
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: bold;
+    }
+
+    .comparison-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(100,116,139,0.2);
+      background-color: var(--bg-white);
+    }
+
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .comparison-table tr:hover td {
+      background-color: var(--bg-light);
+    }
+
+    /* ビジュアルグリッド */
+    .visual-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .visual-item {
+      background: var(--bg-white);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .visual-item:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 25px rgba(0,0,0,0.2);
+    }
+
+    .visual-icon {
+      font-size: 3rem;
+      color: var(--accent-start);
+      margin-bottom: 1rem;
+    }
+
+    .visual-title {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: var(--accent-start);
+    }
+
+    .visual-description {
+      color: var(--fg-light);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* ピラミッド図 */
+    .pyramid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 2rem auto;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .pyramid-level {
+      background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-bottom: 5px;
+      position: relative;
+      border-radius: 6px;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .pyramid-level:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+    }
+
+    .pyramid-level:nth-child(1) { width: 60%; }
+    .pyramid-level:nth-child(2) { width: 75%; }
+    .pyramid-level:nth-child(3) { width: 90%; }
+    .pyramid-level:nth-child(4) { width: 100%; }
+
+    /* 円形スマートアート */
+    .circular-chart {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 2rem auto;
+    }
+
+    .center-circle {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
+      z-index: 10;
+    }
+
+    .satellite {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--accent-start);
+      border: 2px solid var(--accent-start);
+    }
+
+    .satellite:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .satellite:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+    .satellite:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
+    .satellite:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
+    .satellite:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+
+    .satellite:nth-child(1):hover { transform: translateX(-50%) scale(1.1); }
+    .satellite:nth-child(2):hover { transform: translateY(-50%) scale(1.1); }
+    .satellite:nth-child(3):hover { transform: translateX(-50%) scale(1.1); }
+    .satellite:nth-child(4):hover { transform: translateY(-50%) scale(1.1); }
+
+    /* レスポンシブ調整 */
+    @media(max-width:768px) {
+      .process-flow {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .process-flow::before {
+        top: 60px;
+        bottom: 60px;
+        left: 35px;
+        right: auto;
+        width: 3px;
+        height: auto;
+      }
+      .process-step {
+        flex-direction: row;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      .step-text, .step-desc {
+        margin-left: 15px;
+        text-align: left;
+      }
+      .visual-grid {
+        grid-template-columns: 1fr;
+      }
+      .circular-chart {
+        width: 250px;
+        height: 250px;
+      }
+      .center-circle {
+        width: 90px;
+        height: 90px;
+      }
+      .satellite {
+        width: 60px;
+        height: 60px;
+        font-size: 0.8rem;
+      }
+    }
   </style>
 </head>
 <body>
   <div id="particles-js"></div>
   <button id="dark-mode-toggle" title="ダークモード切替"><i class="fas fa-moon"></i></button>
-  <aside id="sidebar"><h1><i class="fas fa-sliders-h"></i>プレゼン目次<button id="maximize-btn">⛶</button></h1><nav><a href="#slide0" data-index="0">トップ</a><a href="#slide1" data-index="1">自己紹介</a><a href="#slide2" data-index="2">背景と目的</a><a href="#slide3" data-index="3">使用技術</a><a href="#slide4" data-index="4">実装手順</a><a href="#slide5" data-index="5">コーディングデモ</a><a href="#slide6" data-index="6">モデル比較サイト</a><a href="#slide7" data-index="7">インタラクティブ分析</a><a href="#slide8" data-index="8">応用アイデア</a><a href="#slide9" data-index="9">まとめ・今後</a></nav></aside>
+  <aside id="sidebar"><h1><i class="fas fa-sliders-h"></i>プレゼン目次<button id="maximize-btn">⛶</button></h1><nav>
+    <a href="#slide0" data-index="0">トップ</a>
+    <a href="#slide1" data-index="1">自己紹介</a>
+    <a href="#slide2" data-index="2">背景と目的</a>
+    <a href="#slide3" data-index="3">視覚化図解</a>
+    <a href="#slide4" data-index="4">使用技術</a>
+    <a href="#slide5" data-index="5">実装手順</a>
+    <a href="#slide6" data-index="6">コーディングデモ</a>
+    <a href="#slide7" data-index="7">モデル比較サイト</a>
+    <a href="#slide8" data-index="8">インタラクティブ分析</a>
+    <a href="#slide9" data-index="9">応用アイデア</a>
+    <a href="#slide10" data-index="10">まとめ・今後</a>
+  </nav></aside>
   <main>
     <div class="slide-header">HTML/CSS/JS プレゼン</div>
     <!-- 0: Title -->
@@ -229,23 +556,123 @@
     <section id="slide1"><div class="slide-card"><h2>自己紹介</h2><p>鉄道会社のIT部門で内製開発をしています。<br><a href="https://takoyaki3.com/" target="_blank" rel="noopener">takoyaki3.com</a>という個人サイトを育ててます。</p><div class="embed-wrap"><iframe src="https://takoyaki3.com/" loading="lazy"></iframe></div></div></section>
     <!-- 2: Background -->
     <section id="slide2"><div class="slide-card"><h2>背景と目的</h2><ul><li><strong>AIで自動化</strong>し、スライド作成の手間を削減</li><li>ブラウザだけで閲覧可能な<strong>配布しやすい資料</strong></li><li>HTML1枚でコード共有も簡単</li></ul></div></section>
-    <!-- 3: Tech -->
-    <section id="slide3"><div class="slide-card"><h2>使用技術</h2><ul><li>HTML5 / CSS3 / Vanilla JavaScript</li><li>ChatGPT（生成AI）</li><li>Chart.js for グラフ</li></ul></div></section>
-    <!-- 4: Steps -->
-    <section id="slide4"><div class="slide-card"><h2>実装手順</h2><ol><li>プロンプト設計で要件をAIに伝える</li><li>AIからHTMLテンプレート生成</li><li>CSS & JSを統合しデザイン調整</li><li>動作確認→ブラッシュアップ</li></ol></div></section>
-    <!-- 5: Demo -->
-    <section id="slide5"><div class="slide-card"><h2>コーディングデモ</h2><p>サイドバー常時表示でレイアウトが安定:</p><pre><code>// ナビゲーションは URL ハッシュ連動
+    <!-- START OF MOVED SECTION: Visualizations (originally slide10, now slide3) -->
+    <!-- 10: Visualizations -->
+    <section id="slide3"><div class="slide-card"><h2>視覚化図解</h2><p>スマートアートを活用した情報の視覚的表現</p>
+
+      <!-- プロセスフロー図 -->
+      <h3 style="text-align: center; margin: 1.5rem 0 0.5rem 0; color: var(--accent-start);">プロセスフロー図</h3>
+      <div class="smartart-container">
+        <div class="process-flow">
+          <div class="process-step">
+            <div class="step-icon"><i class="fas fa-lightbulb"></i></div>
+            <div class="step-text">企画</div>
+            <div class="step-desc">アイデアの創出と要件定義</div>
+          </div>
+          <div class="process-step">
+            <div class="step-icon"><i class="fas fa-pencil-alt"></i></div>
+            <div class="step-text">設計</div>
+            <div class="step-desc">詳細な計画と設計</div>
+          </div>
+          <div class="process-step">
+            <div class="step-icon"><i class="fas fa-code"></i></div>
+            <div class="step-text">開発</div>
+            <div class="step-desc">コーディングと実装</div>
+          </div>
+          <div class="process-step">
+            <div class="step-icon"><i class="fas fa-vial"></i></div>
+            <div class="step-text">テスト</div>
+            <div class="step-desc">品質確認と修正</div>
+          </div>
+          <div class="process-step">
+            <div class="step-icon"><i class="fas fa-rocket"></i></div>
+            <div class="step-text">リリース</div>
+            <div class="step-desc">展開と運用開始</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 円形チャート -->
+      <h3 style="text-align: center; margin: 2rem 0 0.5rem 0; color: var(--accent-start);">円形関連図</h3>
+      <div class="smartart-container">
+        <div class="circular-chart">
+          <div class="satellite">計画</div>
+          <div class="satellite">実行</div>
+          <div class="satellite">評価</div>
+          <div class="satellite">改善</div>
+          <div class="center-circle">PDCA<br>サイクル</div>
+        </div>
+      </div>
+
+      <!-- ピラミッド図 -->
+      <h3 style="text-align: center; margin: 2rem 0 0.5rem 0; color: var(--accent-start);">階層ピラミッド</h3>
+      <div class="smartart-container">
+        <div class="pyramid">
+          <div class="pyramid-level">戦略</div>
+          <div class="pyramid-level">戦術</div>
+          <div class="pyramid-level">オペレーション</div>
+          <div class="pyramid-level">基盤システム</div>
+        </div>
+      </div>
+
+      <!-- 比較表 -->
+      <h3 style="text-align: center; margin: 2rem 0 0.5rem 0; color: var(--accent-start);">比較表</h3>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>従来手法</th>
+            <th>提案手法</th>
+            <th>メリット</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>開発期間</td>
+            <td>2-3週間</td>
+            <td>3-5日</td>
+            <td>大幅な時間短縮</td>
+          </tr>
+          <tr>
+            <td>コスト</td>
+            <td>高い</td>
+            <td>低い</td>
+            <td>コスト削減</td>
+          </tr>
+          <tr>
+            <td>カスタマイズ性</td>
+            <td>限定的</td>
+            <td>高い</td>
+            <td>柔軟な対応</td>
+          </tr>
+          <tr>
+            <td>保守性</td>
+            <td>複雑</td>
+            <td>シンプル</td>
+            <td>メンテナンス容易</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div></section>
+    <!-- END OF MOVED SECTION -->
+    <!-- 3: Tech (now slide4) -->
+    <section id="slide4"><div class="slide-card"><h2>使用技術</h2><ul><li>HTML5 / CSS3 / Vanilla JavaScript</li><li>ChatGPT（生成AI）</li><li>Chart.js for グラフ</li></ul></div></section>
+    <!-- 4: Steps (now slide5) -->
+    <section id="slide5"><div class="slide-card"><h2>実装手順</h2><ol><li>プロンプト設計で要件をAIに伝える</li><li>AIからHTMLテンプレート生成</li><li>CSS & JSを統合しデザイン調整</li><li>動作確認→ブラッシュアップ</li></ol></div></section>
+    <!-- 5: Demo (now slide6) -->
+    <section id="slide6"><div class="slide-card"><h2>コーディングデモ</h2><p>サイドバー常時表示でレイアウトが安定:</p><pre><code>// ナビゲーションは URL ハッシュ連動
 history.replaceState(null,'',`#slide${current}`);
 </code></pre></div></section>
-    <!-- 6: Model site -->
-    <section id="slide6"><div class="slide-card"><h2>生成AIモデル比較サイト</h2><p>主要モデルを横断比較できる便利サイト:</p><div class="embed-wrap"><iframe src="https://artificialanalysis.ai/" loading="lazy"></iframe></div></div></section>
-    <!-- 7: Interactive -->
-    <section id="slide7"><div class="slide-card"><h2>インタラクティブ分析デモ</h2><p>複数のグラフをカード形式で表示し、閾値フィルタで動的にハイライト。</p><div class="chart-grid"><div class="chart-card"><canvas id="lineChart"></canvas><p>月別サンプル値 (折れ線)</p></div><div class="chart-card"><canvas id="barChart"></canvas><p>月別サンプル値 (棒)</p></div><div class="chart-card"><canvas id="pieChart"></canvas><p>カテゴリ構成 (円)</p></div></div><div id="controls"><label for="threshold">閾値フィルタ: <span id="val">0</span></label><input type="range" id="threshold" min="0" max="100" value="0" /></div></div></section>
-    <!-- 8: Ideas -->
-    <section id="slide8"><div class="slide-card"><h2>応用アイデア</h2><ul><li>社内ドキュメント自動プレゼン化</li><li>APIリファレンスWebスライド化</li><li>教育教材の自動生成</li></ul></div></section>
-    <!-- 9: Summary -->
-    <section id="slide9"><div class="slide-card"><h2>まとめ・今後の展望</h2><p>生成AIで誰もが素早く魅力的なWebプレゼンを作成できる未来へ。</p><ul><li>テーマ自動最適化</li><li>Markdown→HTML変換パイプライン</li><li>リアルタイム共同編集機能</li></ul></div></section>
-    <div class="slide-footer">Slide <span id="num">1</span> / 10</div>
+    <!-- 6: Model site (now slide7) -->
+    <section id="slide7"><div class="slide-card"><h2>生成AIモデル比較サイト</h2><p>主要モデルを横断比較できる便利サイト:</p><div class="embed-wrap"><iframe src="https://artificialanalysis.ai/" loading="lazy"></iframe></div></div></section>
+    <!-- 7: Interactive (now slide8) -->
+    <section id="slide8"><div class="slide-card"><h2>インタラクティブ分析デモ</h2><p>複数のグラフをカード形式で表示し、閾値フィルタで動的にハイライト。</p><div class="chart-grid"><div class="chart-card"><canvas id="lineChart"></canvas><p>月別サンプル値 (折れ線)</p></div><div class="chart-card"><canvas id="barChart"></canvas><p>月別サンプル値 (棒)</p></div><div class="chart-card"><canvas id="pieChart"></canvas><p>カテゴリ構成 (円)</p></div></div><div id="controls"><label for="threshold">閾値フィルタ: <span id="val">0</span></label><input type="range" id="threshold" min="0" max="100" value="0" /></div></div></section>
+    <!-- 8: Ideas (now slide9) -->
+    <section id="slide9"><div class="slide-card"><h2>応用アイデア</h2><ul><li>社内ドキュメント自動プレゼン化</li><li>APIリファレンスWebスライド化</li><li>教育教材の自動生成</li></ul></div></section>
+    <!-- 9: Summary (now slide10) -->
+    <section id="slide10"><div class="slide-card"><h2>まとめ・今後の展望</h2><p>生成AIで誰もが素早く魅力的なWebプレゼンを作成できる未来へ。</p><ul><li>テーマ自動最適化</li><li>Markdown→HTML変換パイプライン</li><li>リアルタイム共同編集機能</li></ul></div></section>
+    <div class="slide-footer">Slide <span id="num">1</span> / <span id="total-slides"></span></div>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
@@ -439,16 +866,24 @@ history.replaceState(null,'',`#slide${current}`);
       const navLinks=Array.from(document.querySelectorAll('#sidebar nav a'));
       const slides=Array.from(document.querySelectorAll('main section'));
       const numEl=document.getElementById('num');
+      const totalSlidesEl = document.getElementById('total-slides'); // Get the new element
       let current=0;
 
       // アイコンをサイドバーのナビゲーションリンクに追加
       navLinks.forEach((link, index) => {
         const icons = [
-          'fa-home', 'fa-user', 'fa-info-circle', 'fa-code',
-          'fa-list-ol', 'fa-laptop-code', 'fa-chart-bar',
-          'fa-chart-line', 'fa-lightbulb', 'fa-flag-checkered'
+          'fa-home', 'fa-user', 'fa-info-circle', 'fa-sitemap', // Added fa-sitemap for Visualizations (new slide3)
+          'fa-code',             // Tech (new slide4)
+          'fa-list-ol',          // Steps (new slide5)
+          'fa-laptop-code',      // Demo (new slide6)
+          'fa-chart-bar',        // Model site (new slide7)
+          'fa-chart-line',       // Interactive (new slide8)
+          'fa-lightbulb',        // Ideas (new slide9)
+          'fa-flag-checkered'    // Summary (new slide10)
         ];
-        link.innerHTML = `<i class="fas ${icons[index]}"></i>${link.textContent}`;
+        if (icons[index]) { // Check if icon exists for the current index
+          link.innerHTML = `<i class="fas ${icons[index]}"></i>${link.textContent}`;
+        }
       });
 
       // スライド切り替えアニメーションの種類を増やす
@@ -474,6 +909,7 @@ history.replaceState(null,'',`#slide${current}`);
         navLinks[current].classList.add('active');
 
         numEl.textContent = current + 1;
+        totalSlidesEl.textContent = slides.length; // Update total slides
         history.replaceState(null, '', `#slide${current}`);
       };
 
