@@ -1,186 +1,102 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HTML／CSS／JavaScriptを生成AIでフルスクラッチして作るプレゼン資料</title>
-    <style>
-        :root {
-            --sidebar-width: 260px;
-            --accent: #3b82f6;
-            --bg: #f8fafc;
-            --fg: #0f172a;
-            --light: #64748b;
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: system-ui, sans-serif;
-            color: var(--fg);
-            background: var(--bg);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-        /* Sidebar */
-        #sidebar {
-            width: var(--sidebar-width);
-            background: #fff;
-            border-right: 1px solid #e2e8f0;
-            padding: 1.5rem 1rem;
-            overflow-y: auto;
-        }
-        #sidebar h1 { font-size: 1.2rem; margin-top: 0; margin-bottom: 1.5rem; }
-        #sidebar nav a {
-            display: block;
-            text-decoration: none;
-            color: var(--light);
-            padding: 0.5rem 0.25rem;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-        #sidebar nav a.active,
-        #sidebar nav a:hover {
-            background: var(--accent);
-            color: #fff;
-        }
-        /* Slide container */
-        main {
-            flex: 1;
-            position: relative;
-        }
-        section {
-            position: absolute;
-            top: 0; left: 0;
-            width: calc(100% - var(--sidebar-width));
-            height: 100%;
-            padding: 2rem;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-        }
-        section.active {
-            display: flex;
-        }
-        section h2 {
-            border-bottom: 3px solid var(--accent);
-            display: inline-block;
-            padding-bottom: 0.25rem;
-            margin-top: 0;
-        }
-        section pre {
-            background: var(--fg);
-            color: var(--bg);
-            padding: 1rem;
-            border-radius: 8px;
-            overflow-x: auto;
-        }
-        /* Responsive */
-        #menu-btn {
-            display: none;
-        }
-        @media(max-width: 768px) {
-            body { flex-direction: column; }
-            #sidebar { position: absolute; z-index: 1000; transform: translateX(-100%); transition: transform 0.3s; }
-            #sidebar.open { transform: translateX(0); }
-            #menu-btn { display: block; position: absolute; top: 1rem; left: 1rem; background: var(--accent); border: none; color: #fff; padding: 0.5rem; cursor: pointer; border-radius: 4px; z-index: 1100; }
-            section { width: 100%; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HTML／CSS／JavaScriptを生成AIでフルスクラッチして作るプレゼン資料</title>
+  <style>
+    :root {
+      --accent-start:#3b82f6;
+      --accent-end:#06b6d4;
+      --bg-light:#f1f5f9;
+      --bg-white:#ffffff;
+      --fg-dark:#0f172a;
+      --fg-light:#64748b;
+      --header-h:56px;
+      --footer-h:36px;
+      --sidebar-w:260px;
+      --radius:14px;
+      --frame-gap:1.5rem;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:"Segoe UI",Roboto,"Noto Sans JP",sans-serif;background:linear-gradient(135deg,var(--accent-start),var(--accent-end));color:var(--fg-dark);height:100vh;overflow:hidden;display:flex;}
+    /* SIDEBAR */
+    #sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sidebar-w);background:var(--bg-white);border-right:1px solid #e2e8f0;padding:1.5rem 1rem;z-index:1100;overflow-y:auto;}
+    #sidebar h1{font-size:1.3rem;margin-bottom:1.5rem;color:var(--accent-start);}#sidebar nav a{display:block;margin:.3rem 0;padding:.5rem .75rem;border-radius:6px;color:var(--fg-light);text-decoration:none;transition:.2s;}#sidebar nav a:hover,#sidebar nav a.active{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:#fff;}
+    /* MAIN */
+    main{margin-left:var(--sidebar-w);flex:1;position:relative;height:100vh;display:flex;align-items:center;justify-content:center;}
+    .slide-header,.slide-footer{position:fixed;left:var(--sidebar-w);width:calc(100% - var(--sidebar-w));display:flex;align-items:center;padding:0 1.5rem;color:#fff;pointer-events:none;}
+    .slide-header{top:0;height:var(--header-h);background:linear-gradient(90deg,var(--accent-end),var(--accent-start));font-size:1.15rem;font-weight:600;}
+    .slide-footer{bottom:0;height:var(--footer-h);background:var(--bg-light);color:var(--fg-light);justify-content:flex-end;pointer-events:auto;}
+    section{position:absolute;inset:var(--header-h) var(--frame-gap) var(--footer-h) var(--frame-gap);display:none;flex-direction:column;justify-content:center;align-items:center;overflow:hidden;}
+    section.active{display:flex;animation:fade .35s ease;}@keyframes fade{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:scale(1);}}
+    .slide-card{width:100%;height:100%;background:var(--bg-white);border-radius:var(--radius);box-shadow:0 4px 18px rgba(0,0,0,.1);padding:clamp(1.5rem,4vw,3rem);overflow:auto;display:flex;flex-direction:column;}
+    .slide-card h2{font-size:clamp(1.75rem,4vw,2.5rem);color:var(--accent-start);text-align:center;margin-bottom:1rem;}
+    .slide-card p,.slide-card ul,.slide-card ol{font-size:clamp(1rem,2vw,1.2rem);margin:.8rem 0;text-align:center;line-height:1.6;}
+    .slide-card ul,.slide-card ol{text-align:left;padding-left:1.2rem;}
+    .slide-card pre{background:#0f172a;color:#f8fafc;padding:1rem;border-radius:8px;overflow-x:auto;font-size:1rem;}
+    /* Embed */
+    .embed-wrap{width:100%;height:calc(100% - 9rem);margin-top:1rem;} .embed-wrap iframe{width:100%;height:100%;border:none;border-radius:8px;}
+    /* Charts grid */
+    .chart-grid{display:grid;gap:1rem;margin-top:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));flex:1;}
+    .chart-card{background:var(--bg-light);border-radius:8px;padding:1rem;display:flex;flex-direction:column;align-items:center;}
+    .chart-card canvas{width:100% !important;height:260px !important;}
+    #controls{margin-top:1rem;display:flex;gap:1rem;align-items:center;justify-content:center;}
+    @media(max-width:1024px){.slide-card{padding:clamp(1rem,3vw,2rem);}}
+    @media(max-width:768px){.slide-card{padding:1.5rem 1rem;} .slide-header,.slide-footer{display:none;} section{inset:0;} .embed-wrap{height:calc(100% - 6rem);} main,body{overflow:auto;height:auto;}}
+  </style>
 </head>
 <body>
-    <button id="menu-btn">☰</button>
-    <aside id="sidebar">
-        <h1>目次</h1>
-        <nav>
-            <a href="#" data-index="0">トップ</a>
-            <a href="#" data-index="1">背景と目的</a>
-            <a href="#" data-index="2">使用技術</a>
-            <a href="#" data-index="3">実装手順</a>
-            <a href="#" data-index="4">コーディングデモ</a>
-            <a href="#" data-index="5">応用アイデア</a>
-            <a href="#" data-index="6">まとめ・今後</a>
-        </nav>
-    </aside>
-    <main>
-        <section id="slide0" class="active">
-            <h2>HTML／CSS／JavaScriptを生成AIでフルスクラッチして作るプレゼン資料</h2>
-            <p>ChatGPTなどの生成AIを活用して、Webベースのプレゼン資料を1つのHTMLファイルだけで構築する方法を紹介します。</p>
-        </section>
-        <section id="slide1">
-            <h2>背景と目的</h2>
-            <ul>
-                <li>スライド作成を<strong>AIで自動化</strong>し、手間を削減</li>
-                <li>Web技術だけで<strong>ブラウザ表示</strong>可能な資料を生成</li>
-                <li>コード共有が簡単：HTML1枚で配布</li>
-            </ul>
-        </section>
-        <section id="slide2">
-            <h2>使用技術</h2>
-            <ul>
-                <li>HTML5 / CSS3 / JavaScript (Vanilla)</li>
-                <li>ChatGPT (生成AI)</li>
-                <li>追加ライブラリ不要</li>
-            </ul>
-        </section>
-        <section id="slide3">
-            <h2>実装手順</h2>
-            <ol>
-                <li>プロンプト設計：目的・構成・要件をAIに明示</li>
-                <li>AI出力のHTMLテンプレートを取得</li>
-                <li>CSSとJSを同一ファイルに統合</li>
-                <li>動作確認＆ブラッシュアップ</li>
-            </ol>
-        </section>
-        <section id="slide4">
-            <h2>コーディングデモ</h2>
-            <p>以下はAIに依頼して得たサンプルコードです（抜粋）。</p>
-            <pre><code>&lt;button id="menu-btn"&gt;☰&lt;/button&gt;
-
-// JSでサイドバーをトグルする
-const btn = document.querySelector('#menu-btn');
-btn.addEventListener('click', () => {
-  document.querySelector('#sidebar').classList.toggle('open');
-});</code></pre>
-        </section>
-        <section id="slide5">
-            <h2>応用アイデア</h2>
-            <ul>
-                <li>社内ドキュメントの自動プレゼン化</li>
-                <li>APIリファレンスのWebスライド化</li>
-                <li>教育教材の自動生成</li>
-            </ul>
-        </section>
-        <section id="slide6">
-            <h2>まとめ・今後の展望</h2>
-            <p>生成AIを活用すれば、コーディングの敷居を下げつつ、オリジナルのWebプレゼン資料を短時間で構築可能です。今後は以下を検討できます：</p>
-            <ul>
-                <li>テーマカラーの自動最適化</li>
-                <li>Markdown → 自動HTML化パイプライン</li>
-                <li>リアルタイム共同編集機能の追加</li>
-            </ul>
-            <p>ご清聴ありがとうございました！</p>
-        </section>
-    </main>
-    <script>
-        const slides = Array.from(document.querySelectorAll('main section'));
-        let current = 0;
-        const update = idx => {
-            slides[current].classList.remove('active');
-            document.querySelectorAll('#sidebar nav a')[current].classList.remove('active');
-            current = idx;
-            slides[current].classList.add('active');
-            document.querySelectorAll('#sidebar nav a')[current].classList.add('active');
-        };
-        document.querySelectorAll('#sidebar nav a').forEach((a, i) => {
-            a.addEventListener('click', e => {
-                e.preventDefault();
-                update(i);
-                if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
-            });
-        });
-        // 初期表示で目次ハイライト
-        document.querySelectorAll('#sidebar nav a')[0].classList.add('active');
-    </script>
+  <aside id="sidebar"><h1>プレゼン目次</h1><nav><a href="#slide0" data-index="0">トップ</a><a href="#slide1" data-index="1">自己紹介</a><a href="#slide2" data-index="2">背景と目的</a><a href="#slide3" data-index="3">使用技術</a><a href="#slide4" data-index="4">実装手順</a><a href="#slide5" data-index="5">コーディングデモ</a><a href="#slide6" data-index="6">モデル比較サイト</a><a href="#slide7" data-index="7">インタラクティブ分析</a><a href="#slide8" data-index="8">応用アイデア</a><a href="#slide9" data-index="9">まとめ・今後</a></nav></aside>
+  <main>
+    <div class="slide-header">HTML/CSS/JS プレゼン</div>
+    <!-- 0: Title -->
+    <section id="slide0" class="active"><div class="slide-card"><h2>HTML／CSS／JavaScriptを生成AIで<br>フルスクラッチして作るプレゼン資料</h2><p>ChatGPTなどの生成AIを活用し、<br>Webベースのプレゼン資料を1つのHTMLファイルにまとめる方法を紹介します。</p></div></section>
+    <!-- 1: Self Intro -->
+    <section id="slide1"><div class="slide-card"><h2>自己紹介</h2><p>鉄道会社のIT部門で内製開発をしています。<br><a href="https://takoyaki3.com/" target="_blank" rel="noopener">takoyaki3.com</a>という個人サイトなど趣味開発も好きです。</p><div class="embed-wrap"><iframe src="https://takoyaki3.com/" loading="lazy"></iframe></div></div></section>
+    <!-- 2: Background -->
+    <section id="slide2"><div class="slide-card"><h2>背景と目的</h2><ul><li><strong>AIで自動化</strong>し、スライド作成の手間を削減</li><li>ブラウザだけで閲覧可能な<strong>配布しやすい資料</strong></li><li>HTML1枚でコード共有も簡単</li></ul></div></section>
+    <!-- 3: Tech -->
+    <section id="slide3"><div class="slide-card"><h2>使用技術</h2><ul><li>HTML5 / CSS3 / Vanilla JavaScript</li><li>ChatGPT（生成AI）</li><li>Chart.js for グラフ</li></ul></div></section>
+    <!-- 4: Steps -->
+    <section id="slide4"><div class="slide-card"><h2>実装手順</h2><ol><li>プロンプト設計で要件をAIに伝える</li><li>AIからHTMLテンプレート生成</li><li>CSS & JSを統合しデザイン調整</li><li>動作確認→ブラッシュアップ</li></ol></div></section>
+    <!-- 5: Demo -->
+    <section id="slide5"><div class="slide-card"><h2>コーディングデモ</h2><p>サイドバー常時表示でレイアウトが安定:</p><pre><code>// ナビゲーションは URL ハッシュ連動
+history.replaceState(null,'',`#slide${current}`);
+</code></pre></div></section>
+    <!-- 6: Model site -->
+    <section id="slide6"><div class="slide-card"><h2>生成AIモデル比較サイト</h2><p>主要モデルを横断比較できる便利サイト:</p><div class="embed-wrap"><iframe src="https://artificialanalysis.ai/" loading="lazy"></iframe></div></div></section>
+    <!-- 7: Interactive -->
+    <section id="slide7"><div class="slide-card"><h2>インタラクティブ分析デモ</h2><p>複数のグラフをカード形式で表示し、閾値フィルタで動的にハイライト。</p><div class="chart-grid"><div class="chart-card"><canvas id="lineChart"></canvas><p>月別サンプル値 (折れ線)</p></div><div class="chart-card"><canvas id="barChart"></canvas><p>月別サンプル値 (棒)</p></div><div class="chart-card"><canvas id="pieChart"></canvas><p>カテゴリ構成 (円)</p></div></div><div id="controls"><label for="threshold">閾値フィルタ: <span id="val">0</span></label><input type="range" id="threshold" min="0" max="100" value="0" /></div></div></section>
+    <!-- 8: Ideas -->
+    <section id="slide8"><div class="slide-card"><h2>応用アイデア</h2><ul><li>社内ドキュメント自動プレゼン化</li><li>APIリファレンスWebスライド化</li><li>教育教材の自動生成</li></ul></div></section>
+    <!-- 9: Summary -->
+    <section id="slide9"><div class="slide-card"><h2>まとめ・今後の展望</h2><p>生成AIで誰もが素早く魅力的なWebプレゼンを作成できる未来へ。</p><ul><li>テーマ自動最適化</li><li>Markdown→HTML変換パイプライン</li><li>リアルタイム共同編集機能</li></ul></div></section>
+    <div class="slide-footer">Slide <span id="num">1</span> / 10</div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const navLinks=Array.from(document.querySelectorAll('#sidebar nav a'));
+    const slides=Array.from(document.querySelectorAll('main section'));
+    const numEl=document.getElementById('num');
+    let current=0;
+    const initHash=()=>{const h=location.hash.replace('#slide','');const i=parseInt(h);return(!isNaN(i)&&i>=0&&i<slides.length)?i:0};
+    const update=idx=>{slides[current].classList.remove('active');navLinks[current].classList.remove('active');current=idx;slides[current].classList.add('active');navLinks[current].classList.add('active');numEl.textContent=current+1;history.replaceState(null,'',`#slide${current}`);};
+    navLinks.forEach((l,i)=>{l.href=`#slide${i}`;l.addEventListener('click',e=>{e.preventDefault();update(i);});});
+    update(initHash());
+    document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')update((current+1)%slides.length);if(e.key==='ArrowLeft')update((current-1+slides.length)%slides.length);});
+    // Chart data
+    const months=[...Array(12).keys()].map(i=>`${i+1}月`);
+    const values=months.map(()=>Math.floor(Math.random()*100));
+    const ctxL=document.getElementById('lineChart').getContext('2d');
+    const ctxB=document.getElementById('barChart').getContext('2d');
+    const ctxP=document.getElementById('pieChart').getContext('2d');
+    const lineChart=new Chart(ctxL,{type:'line',data:{labels:months,datasets:[{label:'折れ線',data:[...values],borderColor:'rgba(59,130,246,0.7)',tension:.3}]},options:{responsive:true,maintainAspectRatio:false}});
+    const barChart=new Chart(ctxB,{type:'bar',data:{labels:months,datasets:[{label:'棒',data:[...values],backgroundColor:'rgba(6,182,212,0.6)'}]},options:{responsive:true,maintainAspectRatio:false}});
+    const pieChart=new Chart(ctxP,{type:'pie',data:{labels:['A','B','C','D'],datasets:[{data:[25,35,20,20],backgroundColor:['rgba(59,130,246,0.7)','rgba(6,182,212,0.7)','rgba(139,92,246,0.7)','rgba(16,185,129,0.7)']}]},options:{responsive:true,maintainAspectRatio:false}});
+    // Threshold filter
+    const slider=document.getElementById('threshold');const valSpan=document.getElementById('val');
+    slider.addEventListener('input',()=>{const t=+slider.value;valSpan.textContent=t;lineChart.data.datasets[0].data=values.map(v=>v>=t?v:null);barChart.data.datasets[0].data=values.map(v=>v>=t?v:null);lineChart.update();barChart.update();});
+  </script>
 </body>
 </html>
